@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: expense-api
+    env: node
+    buildCommand: npm ci
+    startCommand: node server/index.js
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        sync: false
