@@ -25,6 +25,7 @@ const CAT_COLORS = {
 export default function TransactionList({ items, onEdit, onDelete, onInlineSave }) {
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
+  const [expandedNotes, setExpandedNotes] = useState({});
 
   const startEdit = (t) => {
     setEditingId(t._id);
@@ -99,7 +100,39 @@ export default function TransactionList({ items, onEdit, onDelete, onInlineSave 
                 {isEditing ? (
                   <input value={draft.note || ''} onChange={(e) => setDraft({ ...draft, note: e.target.value })} />
                 ) : (
-                  t.note || '-'
+                  (() => {
+                    const note = t.note?.trim();
+                    if (!note) return '-';
+                    const LIMIT = 80;
+                    const isLong = note.length > LIMIT;
+                    const expanded = !!expandedNotes[t._id];
+                    const display = expanded || !isLong ? note : note.slice(0, LIMIT) + '…';
+                    return (
+                      <span style={{ display: 'inline' }}>
+                        <span style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{display}</span>
+                        {isLong && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setExpandedNotes((prev) => ({ ...prev, [t._id]: !expanded }));
+                            }}
+                            aria-expanded={expanded}
+                            style={{
+                              marginLeft: 8,
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--accent)',
+                              cursor: 'pointer',
+                              padding: 0,
+                              textDecoration: 'underline'
+                            }}
+                          >
+                            {expanded ? 'See less' : 'See more'}
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })()
                 )}
               </td>
               <td style={{ textAlign: 'right', color: (isEditing ? draft.type : t.type) === 'expense' ? '#c0392b' : '#27ae60' }}>
