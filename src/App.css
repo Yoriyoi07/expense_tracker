@@ -45,7 +45,8 @@ header h1 { margin: 0 0 12px; }
 .summary strong { color: var(--text); }
 
 section { background: var(--panel); border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin: 16px 0; }
-section h2 { margin-top: 0; }
+section h2 { margin: 0; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 
 .tx-form { display: grid; gap: 12px; }
 .tx-form .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -67,6 +68,9 @@ section h2 { margin-top: 0; }
 .tx-table { width: 100%; border-collapse: collapse; }
 .tx-table th, .tx-table td { border-bottom: 1px solid var(--border); padding: 10px 12px; text-align: left; }
 .tx-table th { color: var(--muted); font-weight: 600; }
+.tx-table .th-btn { background: none; border: none; color: var(--text); font: inherit; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 6px; }
+.tx-table .th-btn:hover { color: var(--accent); }
+.tx-table .th-btn:focus { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .tx-table tr:hover { background: var(--panel-2); }
 .tx-table button { background: #374151; color: white; border: 0; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-right: 6px; }
 .tx-table button.danger { background: var(--danger); }
@@ -135,6 +139,15 @@ section h2 { margin-top: 0; }
 
 /* Table responsive container */
 .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+
+/* Table toolbar */
+.table-toolbar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 0; }
+.search-wrap { position: relative; width: 100%; max-width: 360px; }
+.search-wrap input { width: 100%; padding: 8px 30px 8px 10px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+.search-wrap .clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 4px; }
+.search-wrap .clear:hover { color: var(--text); }
+.inline-filter { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+.inline-filter select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; }
 .table-container .tx-table { min-width: 720px; }
 
 /* Modal */

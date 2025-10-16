@@ -22,10 +22,47 @@ const CAT_COLORS = {
   other: '#9ca3af'
 };
 
-export default function TransactionList({ items, onEdit, onDelete, onInlineSave }) {
+export default function TransactionList({ items, onEdit, onDelete, onInlineSave, searchQuery = '', typeFilter = 'all' }) {
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
   const [expandedNotes, setExpandedNotes] = useState({});
+  const [sort, setSort] = useState({ key: 'date', dir: 'desc' });
+
+  const toggleSort = (key) => {
+    setSort((prev) => {
+      if (prev.key !== key) return { key, dir: 'asc' };
+      return { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' };
+    });
+  };
+
+  const filtered = (items || []).filter((t) => {
+    if (typeFilter !== 'all' && t.type !== typeFilter) return false;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const fields = [
+      t.note || '',
+      t.category || '',
+      t.type || '',
+      String(t.amount || ''),
+      new Date(t.date).toLocaleDateString(),
+    ];
+    return fields.some((f) => String(f).toLowerCase().includes(q));
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    const get = (t) => {
+      if (sort.key === 'date') return new Date(t.date).getTime();
+      if (sort.key === 'type') return t.type || '';
+      if (sort.key === 'category') return t.category || '';
+      return 0;
+    };
+    const av = get(a);
+    const bv = get(b);
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
 
   const startEdit = (t) => {
     setEditingId(t._id);
@@ -52,16 +89,28 @@ export default function TransactionList({ items, onEdit, onDelete, onInlineSave 
     <table className="tx-table">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Category</th>
+          <th>
+            <button className="th-btn" onClick={() => toggleSort('date')} aria-label="Sort by date">
+              Date {sort.key === 'date' ? (sort.dir === 'asc' ? '▲' : '▼') : ''}
+            </button>
+          </th>
+          <th>
+            <button className="th-btn" onClick={() => toggleSort('type')} aria-label="Sort by type">
+              Type {sort.key === 'type' ? (sort.dir === 'asc' ? '▲' : '▼') : ''}
+            </button>
+          </th>
+          <th>
+            <button className="th-btn" onClick={() => toggleSort('category')} aria-label="Sort by category">
+              Category {sort.key === 'category' ? (sort.dir === 'asc' ? '▲' : '▼') : ''}
+            </button>
+          </th>
           <th>Note</th>
           <th style={{ textAlign: 'right' }}>Amount</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {items.map((t) => {
+        {sorted.map((t) => {
           const isEditing = editingId === t._id;
           return (
             <tr key={t._id}>

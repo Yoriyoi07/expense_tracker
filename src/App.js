@@ -21,6 +21,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
   const [confirmState, setConfirmState] = useState({ open: false, id: null });
+  const [formResetKey, setFormResetKey] = useState(0);
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [month, setMonth] = useState(currentMonth());
   const [error, setError] = useState('');
   const [theme, setTheme] = useState(() => {
@@ -70,6 +73,7 @@ function App() {
     try {
       await createTransaction(payload);
       setEditing(null);
+      setFormResetKey((k) => k + 1);
       fetchItems();
       toast.success('Transaction added');
     } catch (e) {
@@ -170,7 +174,12 @@ function App() {
 
       <section>
         <h2>{editing ? 'Edit Transaction' : 'Add Transaction'}</h2>
-        <TransactionForm onSubmit={editing ? onUpdate : onAdd} initialData={editing} onCancel={() => setEditing(null)} />
+        <TransactionForm
+          key={editing ? `edit-${editing._id}` : `new-${formResetKey}`}
+          onSubmit={editing ? onUpdate : onAdd}
+          initialData={editing}
+          onCancel={() => setEditing(null)}
+        />
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
           <button className="btn btn-ghost export-btn" onClick={() => exportTransactionsToCsv(items, `transactions-${month}.csv`)}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v8.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 12.586V4a1 1 0 0 1 1-1z"/><path d="M5 18a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z"/></svg>
@@ -185,9 +194,44 @@ function App() {
       </section>
 
       <section>
-        <h2>Transactions</h2>
+        <div className="section-header">
+          <h2>Transactions</h2>
+          <div className="table-toolbar">
+            <label className="inline-filter">
+              <span>Type</span>
+              <select aria-label="Filter by type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+            </label>
+            <div className="search-wrap">
+              <input
+                type="text"
+                placeholder="Search transactions..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search transactions"
+              />
+              {search && (
+                <button className="clear" aria-label="Clear search" onClick={() => setSearch('')}>×</button>
+              )}
+            </div>
+          </div>
+        </div>
         <div className="table-container">
-          {loading ? <p style={{ padding: 12 }}>Loading...</p> : <TransactionList items={items} onEdit={setEditing} onDelete={onDelete} onInlineSave={onInlineSave} />}
+          {loading ? (
+            <p style={{ padding: 12 }}>Loading...</p>
+          ) : (
+            <TransactionList
+              items={items}
+              searchQuery={search}
+              typeFilter={typeFilter}
+              onEdit={setEditing}
+              onDelete={onDelete}
+              onInlineSave={onInlineSave}
+            />
+          )}
         </div>
       </section>
     </div>
