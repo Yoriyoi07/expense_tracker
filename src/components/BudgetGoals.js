@@ -55,7 +55,7 @@ export default function BudgetGoals({ month, totals }) {
   const budgetNum = Number(budget || 0);
   const remaining = Math.max(0, budgetNum - totals.expense);
   const pct = budgetNum ? Math.min(100, Math.round((totals.expense / budgetNum) * 100)) : 0;
-
+//yupyup
   return (
     <div className="budget">
       <div className="row">
