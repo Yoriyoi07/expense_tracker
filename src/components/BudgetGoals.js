@@ -37,7 +37,7 @@ export default function BudgetGoals({ month, totals }) {
       const num = Number(val || 0);
       if (initialChange.current) {
         initialChange.current = false;
-        return; // skip put/toast on initial load
+        return; // skip put/toast on initial loads
       }
       try {
         await api.put(`/api/budgets/${month}`, { amount: num });
